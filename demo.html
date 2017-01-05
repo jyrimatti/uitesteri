@@ -1,0 +1,123 @@
+<html>
+<head>
+	<title></title>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script type="text/javascript" src="jquery.simulate.js"></script>
+	<script type="text/javascript" src="uitesteri.js"></script>
+	<style type="text/css">
+		textarea, select, button, input { margin: 1em; }
+		label, div { padding: 1em 0 0 0; }
+	</style>
+</head>
+<body>
+	<section>
+		<h2>Basic</h2>
+
+		<p>Whatever you search, it has to be expressed so that the result is unique.</p>
+
+		<p>You can search for a specific piece of text.</p>
+
+		<p>Images can be found using their alt-text.</p>
+		<img src="http://www.w3schools.com/images/w3schools_green.jpg" alt="W3 schools" />
+
+		<hr />
+		You can limit the scope by a path which "looks like" a hierarchy to the end user:
+		<br />
+		foo
+		<div>
+			<div>sub header</div>
+			foo
+			<div>
+				<div>subsub-header</div>
+				foo
+			</div>
+		</div>
+		<hr />
+
+		<p>In case all else fails, use <i data-uitesteri="fallback-to-avoid">data-uitesteri</i> -attribute.</p>
+	</section>
+
+	<section>
+		<h2>Labels and fieldsets</h2>
+		<label>
+			You can find a component with its wrapping label.
+			<input type="text" value="" />
+		</label>
+		<br />
+		<input type="text" id="labeltest" value="" />
+		<label for="labeltest">The label can be external to its field.</label>
+		<br />
+		<fieldset>
+			<legend>Fieldset legend can be used to limit the scope to the specific fieldset.</legend>
+			<label>
+				input label
+				<input type="text" id="input" value="" />
+			</label>
+		</fieldset>
+	</section>
+
+	<section>
+		<h2>Form fields</h2>
+
+		<p>Various kinds of form fields can be controlled.</p>
+		
+		<input type="text" value="input text" />
+		<input type="text" placeholder="input placeholder" />
+		<br />
+		<textarea>textarea text</textarea>
+		<br/>
+		<label>
+			<select>
+				<optgroup label="latin">
+					<option>lorem</option>
+					<option>ipsum</option>
+				</optgroup>
+				<optgroup label="finnish">
+					<option>hei</option>
+					<option>moi</option>
+				</optgroup>
+			</select>
+			You can limit the scope to an optgroup.</label>
+		<br/>
+		<label><input type="radio" name="radio" />radio 1 label</label>
+		<label><input id="rext" type="radio" name="radio" />radio 2 label</label>
+		<br/>
+		<label><input type="checkbox" name="checkbox" />checkbox label</label>
+		<br/>
+		<button>button text</button>
+		<input type="button" value="input button text" />
+		<br/>
+		<label>datalist label<input list="latin" /></label>
+		<datalist id="latin">
+		    <option value="lorem" />
+		    <option value="ipsum" />
+		    <option value="dolor" />
+		</datalist>
+
+		<br />
+		<label><input type="number" min="1" max="5" />number</label>
+		<br />
+		<label><input type="date" />date</label>
+		<br />
+		<label><input type="color" />color</label>
+		<br />
+		<label><input type="range" min="0" max="10" />range</label>
+		<br />
+		<label><input type="month" />month</label>
+		<br />
+		<label><input type="week" />week</section>
+		<br />
+		<label><input type="time" />time</label>
+		<br />
+		<label><input type="datetime-local" />datetime-local</label>
+		<br />
+		<label><input type="email" />email</label>
+		<br />
+		<label><input type="search" />search</label>
+		<br />
+		<label><input type="tel" />tel</label>
+		<br />
+		<label><input type="url" />url</label>
+	</label>
+</body>
+</html>

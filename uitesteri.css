@@ -1,0 +1,63 @@
+body {
+	display: flex;
+	flex-direction: row;
+}
+section {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+section:first-child {
+	width: 300px;
+	height: 100%;
+	overflow-y: scroll;
+	flex-grow: 0;
+}
+pre {
+	overflow-x: auto;
+	font-size: 0.1em;
+}
+.top {
+	height: 50px;
+}
+#newTest {
+	width: 200px;
+	height: 100px;
+}
+.test > .content {
+    max-height: 0;
+    transition: max-height 0.5s ease-out;
+    overflow: hidden;
+}
+.test.running > .content {
+	max-height: 100%;
+	transition: max-height 0.5s ease-out;
+}
+.suite:hover .content {
+    max-height: 100%;
+    transition: max-height 0.5s ease-in;
+}
+.test {
+	margin: 10px;
+}
+.test .name {
+	font-weight: bold;
+}
+.test .results {
+	margin-left: 10px;
+	font-size: 0.7em;
+	max-height: 100px;
+}
+.testframe {
+	height: 100%;
+}
+.running {
+	color: orange;
+	border: 1px solid orange;
+}
+.success {
+	color: green;
+}
+.failed {
+	color: red;
+}
