@@ -1,5 +1,6 @@
+[
 (function() {var suite = [
-function Demo_test() {
+(function() {var test = function() {
   with (uitesteri) with (commands) {
     return steps(
       gotoLocation('demo.html'),
@@ -14,5 +15,6 @@ function Demo_test() {
       type('Found it!', find('scope to the specific fieldset', 'input label'))
     );
   }
-}
-]; suite.name = 'Demo Suite'; return suite; })()
+}; test.title = "Demo test"; return test; })()
+]; suite.title = "Demo suite"; return suite; })()
+]

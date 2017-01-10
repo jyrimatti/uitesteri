@@ -15,10 +15,11 @@
 			<label>speed: <input id="speed" onchange="speedChange(this)" type="text" value="200" /> </label>
 		</div>
 		<div class="middle">
-			<button onclick="addTest()">Lisää testi</button><textarea id="newTest" type="text"></textarea>
+			<button onclick="newSuite()" title="Add test suite">+</button>
+			<button onclick="exportTests()" title="Export all tests">&darr;</button>
 		</div>
 		<div class="bottom">
-			<div class="tests">
+			<div class="suites">
 				
 			</div>
 		</div>
@@ -27,5 +28,7 @@
 	<section>
 		<iframe id="testframe" class="testframe" src="demo.html"></iframe>
 	</section>
+
+	<pre id="export"></pre>
 </body>
 </html>

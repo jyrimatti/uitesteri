@@ -7,13 +7,21 @@
         } else if (e.data.name == 'continue') {
             uitesteri.cont();
         } else if (e.data.name == 'run') {
-            var test = eval('(' + e.data.test + ')');
-            var commands = typeof test == 'function' ? test() : test;
-            if (e.data.skip)
-                commands = commands.slice(e.data.skip);
-            uitesteri.run(commands, function(res) {
-                uitesteri.postMessage({ name: 'finished', results: res });
-            });
+            try {
+                var test = eval('(' + e.data.test + ')');
+                var commands = typeof test == 'function' ? test() : test;
+                if (e.data.skip) {
+                    commands = commands.slice(e.data.skip);
+                }
+                uitesteri.run(commands, function(res) {
+                    uitesteri.postMessage({ name: 'finished', results: res });
+                });
+            } catch (e) {
+                uitesteri.run([], function(res) {
+                    res.results = {exception: { name: e.name, message: e.message, fileName: e.fileName, lineNumber: e.lineNumber }};
+                    uitesteri.postMessage({ name: 'finished', results: res });
+                });
+            }
         }
         if (original) {
             original(e);
@@ -130,14 +138,17 @@ window.uitesteri = {
     },
 
     run: function(commands, callback) {
+        var finalResults = function() {
+            return {
+                started: new Date().getTime(),
+                results: [],
+                ended: new Date().getTime()
+            };
+        };
         if (commands.length == 0) {
             uitesteri.cont = undefined;
             if (callback) {
-                callback({
-                    started: new Date().getTime(),
-                    results: [],
-                    ended: new Date().getTime()
-                });
+                callback(finalResults());
             }
             return;
         }
@@ -149,6 +160,13 @@ window.uitesteri = {
             if (uitesteri.unloading) {
                 return;
             }
+            if (singleResult.exception) {
+                if (callback) {
+                    callback(finalResults());
+                }
+                return;
+            }
+
             uitesteri.cont = function() {
                 uitesteri.run(tail, function(allResults) {
                     allResults.results.push(singleResult);

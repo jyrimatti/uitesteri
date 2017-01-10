@@ -6,6 +6,7 @@ section {
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
+	padding: 0.5em;
 }
 section:first-child {
 	width: 300px;
@@ -17,12 +18,22 @@ pre {
 	overflow-x: auto;
 	font-size: 0.1em;
 }
-.top {
-	height: 50px;
+h3, h4 {
+	display: inline;
+	margin: 0 0.5em;
 }
-#newTest {
-	width: 200px;
-	height: 100px;
+button {
+	vertical-align: top;
+}
+.middle {
+	padding: 1em 0;
+}
+.suite {
+	padding: 0.5em 0;
+}
+.suite:hover .content {
+    max-height: 100%;
+    transition: max-height 0.5s ease-in;
 }
 .test > .content {
     max-height: 0;
@@ -32,10 +43,6 @@ pre {
 .test.running > .content {
 	max-height: 100%;
 	transition: max-height 0.5s ease-out;
-}
-.suite:hover .content {
-    max-height: 100%;
-    transition: max-height 0.5s ease-in;
 }
 .test {
 	margin: 10px;
@@ -60,4 +67,16 @@ pre {
 }
 .failed {
 	color: red;
+}
+.remove {
+	float: right;
+}
+#export {
+	display: none;
+	position: fixed;
+    z-index: 9999;
+    width: 98%;
+    height: 98%;
+    background: lightGray;
+    left: 1%;
 }
