@@ -117,9 +117,12 @@ window.runSuite = function(self) {
 
 window.newTest = function(self) {
     addTest($(self).parents('.suite'),
-      'with (uitesteri) with (commands) {\n' +
-      '  return steps(\n' +
-      '  );\n' +
+      'function() {\n' +
+      '  with (uitesteri) with (commands) {\n' +
+      '    return steps(\n' +
+      '      // TODO: add steps here\n' +
+      '    );\n' +
+      '  }\n' +
       '}'
     );
 };
@@ -141,11 +144,11 @@ window.exportTests = function() {
     $('#export')
         .text('[\n' + $('.suite').map(function() {
             var suiteName = $('h3', this).text();
-            return '(function() {var suite = [\n' + $('.test', this).map(function() {
+            return '(function() {var suite = [\n\n' + $('.test', this).map(function() {
                 var testName = $('h4', this).text();
                 return '(function() {var test = function() {\n' + $('pre', this).text() + '\n; test.name = "' + testName + '"; return test; })()';
-            }).toArray().join(',\n') + '\n]; suite.name = "' + suiteName + '"; return suite; })()';
-        }).toArray().join(',\n') + '\n]')
+            }).toArray().join(',\n\n') + '\n\n]; suite.name = "' + suiteName + '"; return suite; })()';
+        }).toArray().join(',\n\n\n\n') + '\n]\n')
         .show()
         .click(function() { $(this).hide(); $('section').show(); });
 };
