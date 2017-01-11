@@ -4,7 +4,7 @@ $(function() {
         console.debug('uitesteri-gui received message: ');
         console.debug(e);
         if (e.data.name == 'load') {
-            postMsg({ name: 'init', url: 'http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js' }, '*');
+            postMsg({ name: 'init', url: 'https://cdnjs.cloudflare.com/ajax/libs/yui/3.18.0/yui/yui-min.js' }, '*');
             setTimeout(function() {
                 postMsg({ name: 'init', url: 'uitesteri-runner.js' }, '*');
             }, 50); // why do I need the delay?
