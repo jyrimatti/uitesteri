@@ -4,14 +4,10 @@ $(function() {
         console.debug('uitesteri-gui received message: ');
         console.debug(e);
         if (e.data.name == 'load') {
-            postMessage({ name: 'init', url: 'https://cdnjs.cloudflare.com/ajax/libs/yui/3.18.1/yui-base/yui-base-min.js' }, '*');
+            postMessage({ name: 'init', url: 'http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js' }, '*');
             setTimeout(function() {
-                postMessage({ name: 'init', url: 'https://cdnjs.cloudflare.com/ajax/libs/yui/3.18.1/event-simulate/event-simulate-min.js' }, '*');
+                postMessage({ name: 'init', url: 'uitesteri-runner.js' }, '*');
             }, 50); // why do I need the delay?
-            setTimeout(function() {
-                var basepath = window.location.href.substring(0, window.location.href.replace(window.location.hash, '').lastIndexOf('/') + 1);
-                postMessage({ name: 'init', url: basepath + 'uitesteri-runner.js' }, '*');
-            }, 100); // why do I need the delay?
         }
         if (original) {
             original(e);
@@ -180,7 +176,7 @@ var runIn = function(iframe, test, callback) {
         } else if (e.data.name == 'load') {
             setTimeout(function() {
                 doRun(executedResults.length);
-            }, 150);  // why do I need the delay?
+            }, 100);  // why do I need the delay?
         }
     };
     newHandler.uitestHandler = true;

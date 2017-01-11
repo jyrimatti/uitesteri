@@ -7,7 +7,7 @@
       highlight(find('Whatever you search')),
       highlight(find('specific piece of text')),
       highlight(find('Images can be found')),
-      click(find('schools')),
+      click(find('Earth')),
       highlight(find('sub header', 'subsub-header', 'foo')),
       highlight(find('fallback-to-avoid')),
       type('Hello!', find('wrapping label')),
