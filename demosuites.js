@@ -13,7 +13,7 @@
       highlight(find('fallback-to-avoid'))
     );
   }
-}; test.title = "Basics"; return test; })()
+}; test.title = "Basics"; return test; })(),
 
 (function() {var test = function() {
   with (uitesteri) with (commands) {
@@ -24,7 +24,7 @@
       type('Found it!', find('scope to the specific fieldset', 'input label'))
     );
   }
-}; test.title = "Labels and fieldsets"; return test; })()
+}; test.title = "Labels and fieldsets"; return test; })(),
 
 (function() {var test = function() {
   with (uitesteri) with (commands) {
