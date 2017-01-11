@@ -4,9 +4,9 @@ $(function() {
         console.debug('uitesteri-gui received message: ');
         console.debug(e);
         if (e.data.name == 'load') {
-            postMessage({ name: 'init', url: 'http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js' }, '*');
+            postMsg({ name: 'init', url: 'http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js' }, '*');
             setTimeout(function() {
-                postMessage({ name: 'init', url: 'uitesteri-runner.js' }, '*');
+                postMsg({ name: 'init', url: 'uitesteri-runner.js' }, '*');
             }, 50); // why do I need the delay?
         }
         if (original) {
@@ -29,7 +29,7 @@ $(function() {
     }
 });
 
-var postMessage = function(data) {
+var postMsg = function(data) {
     var testframe = document.getElementById('testframe');
     console.debug('uitesteri-gui posting message:');
     console.debug(data);
@@ -65,7 +65,7 @@ var runall = function() {
 };
 
 var step = function() {
-    postMessage({ name: 'continue' }, '*');
+    postMsg({ name: 'continue' }, '*');
 };
 
 var run = function(tests) {
@@ -97,7 +97,7 @@ var errors = function(results) {
 window.speedChange = function(self) {
     var speed = self.value;
     console.info('Changing speed to ' + speed);
-    postMessage({ name: 'speed', speed: speed }, '*');
+    postMsg({ name: 'speed', speed: speed }, '*');
 };
 
 window.runTest = function(self) {
@@ -155,8 +155,8 @@ var runIn = function(iframe, test, callback) {
         throw new Error('Already executing');
 
     var doRun = function(skip) {
-        postMessage({ name: 'speed', speed: document.getElementById('speed').value }, '*');
-        postMessage({ name: 'run', test: test.toString(), skip: skip }, '*');
+        postMsg({ name: 'speed', speed: document.getElementById('speed').value }, '*');
+        postMsg({ name: 'run', test: test.toString(), skip: skip }, '*');
     };
 
     var executedResults = [];

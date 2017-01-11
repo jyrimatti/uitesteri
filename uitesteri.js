@@ -17,4 +17,4 @@ window.onmessage = function(original) { return function(e) {
     }
 };}(window.onmessage);
 
-window.postMessage({ name: 'load' }, '*');
+parent.postMessage({ name: 'load' }, '*');
