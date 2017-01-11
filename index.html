@@ -9,27 +9,29 @@
 	<link rel="stylesheet" type="text/css" href="uitesteri.css" />
 </head>
 <body>
-	<section>
-		<div class="top">
-			<button id="runall" onclick="runall()">Aja kaikki</button>
-			<button id="step" onclick="step()">Step</button>
-			<label>speed: <input id="speed" onchange="speedChange(this)" type="text" value="200" /> </label>
-		</div>
-		<div class="middle">
-			<button onclick="newSuite()" title="Add test suite">+</button>
-			<button onclick="exportTests()" title="Export all tests">&darr;</button>
-		</div>
-		<div class="bottom">
-			<div class="suites">
-				
+	<h1>UITesteri - A web testing framework from the perspective of end users</h1>
+	<div class="body">
+		<section>
+			<div class="top">
+				<button id="runall" onclick="runall()">Aja kaikki</button>
+				<button id="step" onclick="step()">Step</button>
+				<label>speed: <input id="speed" onchange="speedChange(this)" type="text" value="200" /> </label>
 			</div>
-		</div>
-	</section>
+			<div class="middle">
+				<button onclick="newSuite()" title="Add test suite">+</button>
+				<button onclick="exportTests()" title="Export all tests">&darr;</button>
+			</div>
+			<div class="bottom">
+				<div class="suites">
+					
+				</div>
+			</div>
+		</section>
 
-	<section>
-		<iframe id="testframe" class="testframe" src="demo.html"></iframe>
-	</section>
-
+		<section>
+			<iframe id="testframe" class="testframe" src="demo.html"></iframe>
+		</section>
+	</div>
 	<pre id="export"></pre>
 </body>
 </html>

@@ -99,7 +99,7 @@ window.uitesteri = {
             for(var i = 0; i < args.length; i++) {
                 context = uitesteri.findFrom(args[i], context)();
             }
-            context.scrollIntoView(false);
+            context.scrollIntoView();
             return context;
         };
     },
@@ -114,13 +114,15 @@ window.uitesteri = {
             }
             var elements = textNodesUnder(context).filter(function(node) { return node.textContent.indexOf(text) > -1; }).map(function(node) { return node.parentNode; });
 
-            var inputs = Array.prototype.slice.call(context.querySelectorAll('input[value*="' + text + '"]'));
+            var inputs = Array.prototype.slice.call(context.querySelectorAll('input[value*="' + text + '"],input[placeholder*="' + text + '"]'));
+
+            var optgroups = Array.prototype.slice.call(context.querySelectorAll('optgroup[label*="' + text + '"]'));
 
             var images = Array.prototype.slice.call(context.querySelectorAll('img[alt*="' + text + '"]'));
 
             var data = Array.prototype.slice.call(context.querySelectorAll('[data-uitesteri*="' + text + '"]'));
 
-            var results = elements.concat(inputs).concat(images).concat(data);
+            var results = elements.concat(inputs).concat(optgroups).concat(images).concat(data);
             if (results.length == 0 && context != document.body) {
                 return uitesteri.findFrom(text, context.parentNode)();
             } else if (results.length == 0) {
@@ -242,6 +244,26 @@ window.uitesteri = {
     simulate: function(elem, event, args) {
         return YUI().use('node-event-simulate', function(Y) { Y.one(elem).simulate(event, args); });
     },
+
+    getX: function(elemFn) {
+        return function() {
+            var elem = elemFn();
+            while (elem.nodeName.toLowerCase() == 'option' || elem.nodeName.toLowerCase() == 'optgroup') {
+                elem = elem.parentNode;
+            }
+            return elem.getBoundingClientRect().left;
+        };
+    },
+
+    getY: function(elemFn) {
+        return function() {
+            var elem = elemFn();
+            while (elem.nodeName.toLowerCase() == 'option' || elem.nodeName.toLowerCase() == 'optgroup') {
+                elem = elem.parentNode;
+            }
+            return elem.getBoundingClientRect().top;
+        }
+    },
     
     commands: {
         mousemove: function(xFn, yFn) {
@@ -256,9 +278,7 @@ window.uitesteri = {
             }];
         },
         click: function(elemFn) {
-            var xFn = function() { return elemFn().getBoundingClientRect().left; };
-            var yFn = function() { return elemFn().getBoundingClientRect().top; };
-            return uitesteri.commands.mousemove(xFn, yFn).concat([{
+            return uitesteri.commands.mousemove(uitesteri.getX(elemFn), uitesteri.getY(elemFn)).concat([{
                 name: 'mousedown',
                 elemFn: elemFn
             }, {
@@ -270,9 +290,7 @@ window.uitesteri = {
             }]);
         },
         drag: function(elemFn, toPercentage) {
-            var xFn = function() { return elemFn().getBoundingClientRect().left; };
-            var yFn = function() { return elemFn().getBoundingClientRect().top; };
-            return uitesteri.commands.mousemove(xFn, yFn).concat([{
+            return uitesteri.commands.mousemove(uitesteri.getX(elemFn), uitesteri.getY(elemFn)).concat([{
                 name: 'drag',
                 toPercentage: toPercentage,
                 elemFn: elemFn
@@ -328,9 +346,7 @@ window.uitesteri = {
             }];
         },
         highlight: function(elemFn) {
-            var xFn = function() { return elemFn().getBoundingClientRect().left; };
-            var yFn = function() { return elemFn().getBoundingClientRect().top; };
-            return uitesteri.commands.mousemove(xFn, yFn).concat([{
+            return uitesteri.commands.mousemove(uitesteri.getX(elemFn), uitesteri.getY(elemFn)).concat([{
                 name: 'highlight',
                 elemFn: elemFn
             }]);
@@ -438,7 +454,10 @@ window.uitesteri = {
         },
         type: function(c) {
             var elem = c.elemFn();
-            var target = elem.querySelector('input,textarea');
+            var target = elem;
+            if (elem.nodeName.toLowerCase() != 'input' && elem.nodeName.toLowerCase() != 'textarea') {
+                target = elem.querySelector('input,textarea');
+            }
             if (!target && elem.nodeName.toLowerCase() == 'label' && elem.attributes['for']) {
                 target = document.getElementById(elem.attributes['for'].value);
             }
@@ -450,7 +469,10 @@ window.uitesteri = {
         },
         clear: function(c) {
             var elem = c.elemFn();
-            var target = elem.querySelector('input,textarea');
+            var target = elem;
+            if (elem.nodeName.toLowerCase() != 'input' && elem.nodeName.toLowerCase() != 'textarea') {
+                target = elem.querySelector('input,textarea');
+            }
             if (!target && elem.nodeName.toLowerCase() == 'label' && elem.attributes['for']) {
                 target = document.getElementById(elem.attributes['for'].value);
             }
