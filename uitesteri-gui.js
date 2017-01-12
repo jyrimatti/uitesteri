@@ -37,7 +37,7 @@ var postMsg = function(data) {
 };
 
 var addSuite = function(suite) {
-    var suiteHTML = $('<div class="suite"><h3 contenteditable>' + (suite.title ? suite.title : 'unnamed suite') + '</h3><button class="runSuite" onclick="runSuite(this)">-></button><button class="remove" onclick="removeSuite(this)" title="Remove suite">-</button><button onclick="newTest(this)" title="Add test">+</button><div class="content"><div class="suitetests"></div></div></div>')
+    var suiteHTML = $('<div class="suite"><h3 contenteditable>' + (suite.title ? suite.title : 'unnamed suite') + '</h3><button class="runSuite" onclick="runSuite(this)">-></button><button class="remove" onclick="removeSuite(this)" title="Remove suite">-</button><button onclick="newTest(this)" title="Add test">+</button><div class="suitetests"></div></div>')
         .appendTo($('.suites'));
     var testContainer = $('.suitetests', suiteHTML);
     suite.forEach(function(test) {
@@ -46,7 +46,7 @@ var addSuite = function(suite) {
 };
 
 var addTest = function(suite, test) {
-    $('<div class="test"><h4 contenteditable></h4><button class="run" onclick="runTest(this)">-></button><button class="remove" onclick="removeTest(this)" title="Remove test">-</button><div class="content"><pre contenteditable class="prettyprint lang-js"></pre><div class="elapsed"></div><div class="results"></div></div></div>')
+    $('<div class="test"><h4 contenteditable></h4><button class="run" onclick="runTest(this)">-></button><button class="remove" onclick="removeTest(this)" title="Remove test">-</button><pre contenteditable class="prettyprint lang-js"></pre><div class="elapsed"></div><div class="results"></div></div>')
         .appendTo(suite)
         .find('.prettyprint').text(test.toString())
         .parents('.test').find('h4').text(test.title ? test.title : 'unnamed test');

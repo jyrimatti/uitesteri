@@ -81,8 +81,10 @@
 		<br/>
 		<label><input type="checkbox" name="checkbox" />checkbox label</label>
 		<br/>
-		<button>button text</button>
-		<input type="button" value="input button text" />
+		<button onclick="this.innerHTML = 'clicked!'">button element</button>
+		<form id="form" action="#form">
+			<input type="submit" value="submit button text" />
+		</form>
 		<br/>
 		<label>datalist label<input list="latin" /></label>
 		<datalist id="latin">

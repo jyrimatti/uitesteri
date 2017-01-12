@@ -18,6 +18,7 @@
                 });
             } catch (e) {
                 uitesteri.run([], function(res) {
+                    console.log(e);
                     res.results = {exception: { name: e.name, message: e.message, fileName: e.fileName, lineNumber: e.lineNumber }};
                     uitesteri.postMessage({ name: 'finished', results: res });
                 });
@@ -94,14 +95,13 @@ window.uitesteri = {
 
     find: function(textVarArgs) {
         var args = arguments;
-        return function() {
+        return (function() {
             var context = document.body;
             for(var i = 0; i < args.length; i++) {
                 context = uitesteri.findFrom(args[i], context)();
             }
-            context.scrollIntoView();
-            return context;
-        };
+            return function() { return context; };
+        })();
     },
     
     findFrom: function(text, context) {
@@ -196,7 +196,9 @@ window.uitesteri = {
         };
         var onFinish = function() {
             ret.ended = new Date().getTime();
-            callback(ret);
+            if (callback) {
+                callback(ret);
+            }
         }
 
         try {
@@ -205,6 +207,7 @@ window.uitesteri = {
             uitesteri.waitAjax(onFinish);
         } catch (e) {
             ret.exception = { name: e.name, message: e.message, fileName: e.fileName, lineNumber: e.lineNumber };
+            console.log(e);
             onFinish();
         }
     },
@@ -264,6 +267,27 @@ window.uitesteri = {
             return elem.getBoundingClientRect().top;
         }
     },
+
+    resolveField: function(elemFn) {
+        return function() {
+            var elem = elemFn();
+            while (elem.nodeName.toLowerCase() == 'option' || elem.nodeName.toLowerCase() == 'optgroup') {
+                elem = elem.parentNode;
+            }
+
+            var target = elem;
+            if (elem.nodeName.toLowerCase() != 'input' && elem.nodeName.toLowerCase() != 'textarea' && elem.nodeName.toLowerCase() != 'select') {
+                target = elem.querySelector('input,textarea,select');
+            }
+            if (!target && elem.nodeName.toLowerCase() == 'label' && elem.attributes['for']) {
+                target = document.getElementById(elem.attributes['for'].value);
+            }
+            if (!target) {
+                target = elem.querySelector('input,textarea,select');
+            }
+            return target;
+        };
+    },
     
     commands: {
         mousemove: function(xFn, yFn) {
@@ -319,25 +343,26 @@ window.uitesteri = {
             }];
         },
         type: function(text, elemFn) {
-            if (text.length == 0) {
-                return [{
-                    name: 'type',
-                    text: text,
-                    elemFn: elemFn
-                }];
-            } else {
-                return text.split('').map(function(char) { return {
-                    name: 'type',
-                    text: char,
-                    elemFn: elemFn
-                }});
-            }
+            elemFn = uitesteri.resolveField(elemFn);
+            return uitesteri.commands.mousemove(uitesteri.getX(elemFn), uitesteri.getY(elemFn)).concat(
+                text.length == 0
+                    ? [{
+                        name: 'type',
+                        text: text,
+                        elemFn: elemFn
+                    }]
+                    : text.split('').map(function(char) { return {
+                        name: 'type',
+                        text: char,
+                        elemFn: elemFn
+                    }}));
         },
         clear: function(elemFn) {
-            return [{
+            elemFn = uitesteri.resolveField(elemFn);
+            return uitesteri.commands.mousemove(uitesteri.getX(elemFn), uitesteri.getY(elemFn)).concat([{
                 name: 'clear',
                 elemFn: elemFn
-            }];
+            }]);
         },
         gotoLocation: function(location) {
             return [{
@@ -383,6 +408,7 @@ window.uitesteri = {
                 }
                 uitesteri.simulate(forElement, 'mousedown');
                 uitesteri.simulate(forElement, 'focus');
+                uitesteri.simulate(forElement, 'click');
 
                 // select2 plugin
                 if (forElement.classList.contains('select2-focusser')) {
@@ -454,33 +480,11 @@ window.uitesteri = {
         },
         type: function(c) {
             var elem = c.elemFn();
-            var target = elem;
-            if (elem.nodeName.toLowerCase() != 'input' && elem.nodeName.toLowerCase() != 'textarea') {
-                target = elem.querySelector('input,textarea');
-            }
-            if (!target && elem.nodeName.toLowerCase() == 'label' && elem.attributes['for']) {
-                target = document.getElementById(elem.attributes['for'].value);
-            }
-            if (!target) {
-                target = elem.parentNode.querySelector('input,textarea');
-            }
-            
-            target.value += c.text;
+            elem.value += c.text;
         },
         clear: function(c) {
             var elem = c.elemFn();
-            var target = elem;
-            if (elem.nodeName.toLowerCase() != 'input' && elem.nodeName.toLowerCase() != 'textarea') {
-                target = elem.querySelector('input,textarea');
-            }
-            if (!target && elem.nodeName.toLowerCase() == 'label' && elem.attributes['for']) {
-                target = document.getElementById(elem.attributes['for'].value);
-            }
-            if (!target) {
-                target = elem.parentNode.querySelector('input,textarea');
-            }
-            
-            target.value = '';
+            elem.value = '';
         },
         gotoLocation: function(c) {
         	if (c.location.indexOf('/') == 0) {
