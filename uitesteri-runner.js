@@ -100,7 +100,14 @@ window.uitesteri = {
             for(var i = 0; i < args.length; i++) {
                 context = uitesteri.findFrom(args[i], context)();
             }
-            return function() { return context; };
+            return function() {
+                context.scrollIntoView();
+                var elementRectTop = uitesteri.getY(function() { return context; })();
+                var absoluteElementTop = elementRectTop + window.pageYOffset;
+                var middle = absoluteElementTop - (window.innerHeight / 2);
+                window.scrollTo(0, middle);
+                return context;
+            };
         })();
     },
     

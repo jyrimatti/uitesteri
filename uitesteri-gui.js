@@ -46,7 +46,7 @@ var addSuite = function(suite) {
 };
 
 var addTest = function(suite, test) {
-    $('<div class="test"><h4 contenteditable></h4><button class="run" onclick="runTest(this)">-></button><button class="remove" onclick="removeTest(this)" title="Remove test">-</button><pre contenteditable class="prettyprint lang-js"></pre><div class="elapsed"></div><div class="results"></div></div>')
+    $('<div class="test"><h4 contenteditable></h4><span class="elapsed"></span><button class="run" onclick="runTest(this)">-></button><button class="remove" onclick="removeTest(this)" title="Remove test">-</button><pre contenteditable class="prettyprint lang-js"></pre><div class="results"></div></div>')
         .appendTo(suite)
         .find('.prettyprint').text(test.toString())
         .parents('.test').find('h4').text(test.title ? test.title : 'unnamed test');
@@ -84,7 +84,7 @@ var run = function(tests) {
 var finished = function(test, results) {
     console.info(results);
     $(test).addClass(errors(results).length > 0 ? 'failed' : 'success')
-      .find('.elapsed').text('Elapsed: ' + (results.results.ended-results.results.started) + 'ms')
+      .find('.elapsed').text('(' + (results.results.ended-results.results.started) + 'ms)')
       .parent().find('.results').text(JSON.stringify(errors(results).map(function(r) { return r.exception.message; })));
 };
 
