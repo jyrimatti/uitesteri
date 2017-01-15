@@ -39,7 +39,21 @@
       click(find('radio 2')),
       click(find('checkbox')),
       click(find('button element')),
-      click(find('submit button'))
+      click(find('submit button')),
+      type('typing', find('datalist')),
+      click(find('datalist', 'vidi')),
+      type('a42', find('numbers')),
+      write('1982-01-22', find('dates')),
+      write('#0000ff', find('color')),
+      write(7, find('range')),
+      write('2014-02', find('month')),
+      write('2017-W12', find('week')),
+      write('12:12:12.111', find('to a time')),
+      write('1982-01-22T09:09', find('datetime-local')),
+      type('foo', find('an email')),
+      type('bar', find('a search')),
+      type('baz', find('a tel')),
+      type('quux', find('a url'))
     );
   }
 }; test.title = "Form fields"; return test; })()

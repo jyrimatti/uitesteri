@@ -125,11 +125,13 @@ window.uitesteri = {
 
             var optgroups = Array.prototype.slice.call(context.querySelectorAll('optgroup[label*="' + text + '"]'));
 
+            var options = Array.prototype.slice.call(context.querySelectorAll('option[value*="' + text + '"]'));
+
             var images = Array.prototype.slice.call(context.querySelectorAll('img[alt*="' + text + '"]'));
 
             var data = Array.prototype.slice.call(context.querySelectorAll('[data-uitesteri*="' + text + '"]'));
 
-            var results = elements.concat(inputs).concat(optgroups).concat(images).concat(data);
+            var results = elements.concat(inputs).concat(optgroups).concat(options).concat(images).concat(data);
             if (results.length == 0 && context != document.body) {
                 return uitesteri.findFrom(text, context.parentNode)();
             } else if (results.length == 0) {
@@ -252,7 +254,13 @@ window.uitesteri = {
     })(),
 
     simulate: function(elem, event, args) {
-        return YUI().use('node-event-simulate', function(Y) { Y.one(elem).simulate(event, args); });
+        return YUI().use('node-event-simulate', function(Y) {
+            if (event == 'tap' || event == 'doubletap' || event == 'press' || event == 'move' || event == 'flick' || event == 'pinch' || event == 'rotate') {
+                Y.one(elem).simulateGesture(event, args);
+            } else {
+                Y.one(elem).simulate(event, args);
+            }
+        });
     },
 
     getX: function(elemFn) {
@@ -335,7 +343,8 @@ window.uitesteri = {
             }]);
         },
         press: function(keyCode, elemFn) {
-            return [{
+            elemFn = uitesteri.resolveField(elemFn);
+            return uitesteri.commands.mousemove(uitesteri.getX(elemFn), uitesteri.getY(elemFn)).concat([{
                 name: 'keydown',
                 keyCode: keyCode,
                 elemFn: elemFn
@@ -347,7 +356,7 @@ window.uitesteri = {
                 name: 'keyup',
                 keyCode: keyCode,
                 elemFn: elemFn
-            }];
+            }]);
         },
         type: function(text, elemFn) {
             elemFn = uitesteri.resolveField(elemFn);
@@ -363,6 +372,15 @@ window.uitesteri = {
                         text: char,
                         elemFn: elemFn
                     }}));
+        },
+        write: function(text, elemFn) {
+            elemFn = uitesteri.resolveField(elemFn);
+            return uitesteri.commands.mousemove(uitesteri.getX(elemFn), uitesteri.getY(elemFn)).concat(
+                [{
+                    name: 'write',
+                    text: text,
+                    elemFn: elemFn
+                }]);
         },
         clear: function(elemFn) {
             elemFn = uitesteri.resolveField(elemFn);
@@ -404,7 +422,15 @@ window.uitesteri = {
             var nodeName = e.nodeName.toLowerCase();
             if (nodeName == 'option') {
                 // don't seem to be able to simulate the actual click on options...
-                e.selected = true;
+                var parent = e.parentNode;
+                while (parent.nodeName.toLowerCase() != 'select' && parent.nodeName.toLowerCase() != 'datalist') {
+                    parent = parent.parentNode;
+                }
+                if (parent.nodeName.toLowerCase() == 'select') {
+                    e.selected = true;
+                } else {
+                    document.querySelector('input[list="' + parent.getAttribute('id') + '"]').value = e.getAttribute('value');
+                }
             } else if (nodeName == 'label') {
                 // for labels instead focus the actual target field
                 var forElement;
@@ -475,19 +501,23 @@ window.uitesteri = {
         },
         keyup: function(c) {
             var elem = c.elemFn();
-            uitesteri.simulate(elem, c.name, {keyCode: c.keyCode, charCode: c.keyCode, which: c.which});
+            uitesteri.simulate(elem, c.name, {keyCode: c.keyCode, charCode: c.keyCode});
         },
         keydown: function(c) {
             var elem = c.elemFn();
-            uitesteri.simulate(elem, c.name, {keyCode: c.keyCode, charCode: c.keyCode, which: c.which});
+            uitesteri.simulate(elem, c.name, {keyCode: c.keyCode, charCode: c.keyCode});
         },
         keypress: function(c) {
             var elem = c.elemFn();
-            uitesteri.simulate(elem, c.name, {keyCode: c.keyCode, charCode: c.keyCode, which: c.which});
+            uitesteri.simulate(elem, c.name, {keyCode: c.keyCode, charCode: c.keyCode});
         },
         type: function(c) {
             var elem = c.elemFn();
             elem.value += c.text;
+        },
+        write: function(c) {
+            var elem = c.elemFn();
+            elem.value = c.text;
         },
         clear: function(c) {
             var elem = c.elemFn();
