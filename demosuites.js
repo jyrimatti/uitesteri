@@ -60,7 +60,7 @@
 
 
 
-]; suite.title = "Demo suite"; return suite; })()
+]; suite.title = "Demo suite"; return suite; })(),
 
 
 (function() {var suite = [
