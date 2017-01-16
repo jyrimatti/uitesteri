@@ -75,7 +75,7 @@
       highlight(find('Tee neuvontapyyntö')),
       highlight(find('Jätä hakemus')),
       type('Kangasala', find('Kirjoita kunnan nimi')),
-      press(13, find('Kirjoita kunnan nimi')),
+      click(find('Katso mistä kunnista', '')),
       highlight(find('Rekisteröidy palveluun')),
       highlight(find('Lupapisteen prosessi'))
     );
