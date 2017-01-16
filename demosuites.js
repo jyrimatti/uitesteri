@@ -61,4 +61,27 @@
 
 
 ]; suite.title = "Demo suite"; return suite; })()
+
+
+(function() {var suite = [
+
+(function() {var test = function() {
+  with (uitesteri) with (commands) {
+    return steps(
+      gotoLocation('https://lahteenmaki.net/https/www.lupapiste.fi/'),
+      click(find('Luvanhakija')),
+      highlight(find('Rekisteröidy pankkitunnuksilla')),
+      highlight(find('Valitse kartalta hankkeesi sijainti')),
+      highlight(find('Tee neuvontapyyntö')),
+      highlight(find('Jätä hakemus')),
+      type('Kangasala', find('Kirjoita kunnan nimi')),
+      press(13, find('Kirjoita kunnan nimi')),
+      highlight(find('Rekisteröidy palveluun')),
+      highlight(find('Lupapisteen prosessi'))
+    );
+  }
+}; test.title = "Luvanhakija"; return test; })()
+
+
+]; suite.title = "Lupapiste suite"; return suite; })()
 ]

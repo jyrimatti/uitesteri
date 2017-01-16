@@ -176,7 +176,7 @@ var runIn = function(iframe, test, callback) {
         } else if (e.data.name == 'load') {
             setTimeout(function() {
                 doRun(executedResults.length);
-            }, 100);  // why do I need the delay?
+            }, 200);  // why do I need the delay?
         }
     };
     newHandler.uitestHandler = true;

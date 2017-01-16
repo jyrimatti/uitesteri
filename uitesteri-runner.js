@@ -122,7 +122,12 @@ window.uitesteri = {
               while(n=walk.nextNode()) a.push(n);
               return a;
             }
-            var elements = textNodesUnder(context).filter(function(node) { return node.textContent.indexOf(text) > -1; }).map(function(node) { return node.parentNode; });
+            var elements;
+            if (text == '') {
+                elements = Array.prototype.slice.call(context.querySelectorAll('button,input[type="submit"]'));
+            } else {
+                elements = textNodesUnder(context).filter(function(node) { return node.textContent.indexOf(text) > -1; }).map(function(node) { return node.parentNode; });
+            }
 
             var inputs = Array.prototype.slice.call(context.querySelectorAll('input[value*="' + text + '"],input[placeholder*="' + text + '"]'));
 
