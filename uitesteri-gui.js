@@ -6,7 +6,7 @@ $(function() {
         if (e.data.name == 'load') {
             postMsg({ name: 'init', url: 'https://cdnjs.cloudflare.com/ajax/libs/yui/3.18.0/yui/yui-min.js' }, '*');
             setTimeout(function() {
-                postMsg({ name: 'init', url: 'uitesteri-runner.js' }, '*');
+                postMsg({ name: 'init', url: 'https://lahteenmaki.net/uitesteri/uitesteri-runner.js' }, '*');
             }, 50); // why do I need the delay?
         }
         if (original) {

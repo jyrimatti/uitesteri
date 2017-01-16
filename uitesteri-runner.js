@@ -96,11 +96,14 @@ window.uitesteri = {
     find: function(textVarArgs) {
         var args = arguments;
         return (function() {
-            var context = document.body;
-            for(var i = 0; i < args.length; i++) {
-                context = uitesteri.findFrom(args[i], context)();
-            }
+            var context;
             return function() {
+                if (!context) {
+                    context = document.body;
+                    for(var i = 0; i < args.length; i++) {
+                        context = uitesteri.findFrom(args[i], context)();
+                    }
+                }
                 context.scrollIntoView();
                 var elementRectTop = uitesteri.getY(function() { return context; })();
                 var absoluteElementTop = elementRectTop + window.pageYOffset;
