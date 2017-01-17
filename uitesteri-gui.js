@@ -7,7 +7,7 @@ $(function() {
             postMsg({ name: 'init', url: 'https://cdnjs.cloudflare.com/ajax/libs/yui/3.18.0/yui/yui-min.js' }, '*');
             setTimeout(function() {
                 postMsg({ name: 'init', url: 'https://lahteenmaki.net/uitesteri/uitesteri-runner.js' }, '*');
-            }, 50); // why do I need the delay?
+            }, 200); // why do I need the delay?
         }
         if (original) {
             original(e);
@@ -37,7 +37,7 @@ var postMsg = function(data) {
 };
 
 var addSuite = function(suite) {
-    var suiteHTML = $('<div class="suite"><h3 contenteditable>' + (suite.title ? suite.title : 'unnamed suite') + '</h3><button class="runSuite" onclick="runSuite(this)">-></button><button class="remove" onclick="removeSuite(this)" title="Remove suite">-</button><button onclick="newTest(this)" title="Add test">+</button><div class="suitetests"></div></div>')
+    var suiteHTML = $('<div class="suite"><h3 contenteditable>' + (suite.title ? suite.title : 'unnamed suite') + '</h3><button class="remove" onclick="removeSuite(this)" title="Remove suite">-</button><button onclick="newTest(this)" title="Add test">+</button><button class="run" onclick="runSuite(this)">&#9658;</button><div class="suitetests"></div></div>')
         .appendTo($('.suites'));
     var testContainer = $('.suitetests', suiteHTML);
     suite.forEach(function(test) {
@@ -46,7 +46,7 @@ var addSuite = function(suite) {
 };
 
 var addTest = function(suite, test) {
-    $('<div class="test"><h4 contenteditable></h4><span class="elapsed"></span><button class="run" onclick="runTest(this)">-></button><button class="remove" onclick="removeTest(this)" title="Remove test">-</button><pre contenteditable class="prettyprint lang-js"></pre><div class="results"></div></div>')
+    $('<div class="test"><h4 contenteditable></h4><span class="elapsed"></span><button class="run" onclick="runTest(this)">&#9658;</button><button class="remove" onclick="removeTest(this)" title="Remove test">-</button><pre contenteditable class="prettyprint lang-js"></pre><div class="results"></div></div>')
         .appendTo(suite)
         .find('.prettyprint').text(test.toString())
         .parents('.test').find('h4').text(test.title ? test.title : 'unnamed test');
@@ -65,6 +65,18 @@ var runall = function() {
 };
 
 var step = function() {
+    postMsg({ name: 'speed', speed: 0 }, '*');
+    postMsg({ name: 'continue' }, '*');
+};
+
+var pause = function() {
+    $(document.body).addClass('paused');
+    postMsg({ name: 'speed', speed: 0 }, '*');
+};
+
+var play = function() {
+    $(document.body).removeClass('paused');
+    postMsg({ name: 'speed', speed: document.getElementById('speed').value }, '*');
     postMsg({ name: 'continue' }, '*');
 };
 
@@ -72,11 +84,22 @@ var run = function(tests) {
     if (tests.length == 0) {
         return;
     }
-    $(tests[0]).addClass('running');
+
+    var test = tests[0];
+
+    var elementRectTop = test.getBoundingClientRect().left
+    var absoluteElementTop = elementRectTop + window.pageYOffset;
+    var middle = absoluteElementTop - (window.innerHeight / 2);
+    window.scrollTo(0, middle);
+
+    $(document.body).addClass('running');
+    $(test).addClass('running');
     var testframe = document.getElementById('testframe');
-    runIn(testframe, eval('(' + $(tests[0]).find('pre').text() + ')'), function(res) {
-        $(tests[0]).removeClass('running');
-        finished(tests[0], res);
+    runIn(testframe, eval('(' + $(test).find('pre').text() + ')'), function(res) {
+        $(document.body).removeClass('running');
+        $(document.body).removeClass('paused');
+        $(test).removeClass('running');
+        finished(test, res);
         run(tests.slice(1));
     }); 
 };
@@ -136,7 +159,7 @@ window.removeTest = function(self) {
 };
 
 window.exportTests = function() {
-    $('section').hide();
+    $('body *').hide();
     $('#export')
         .text('[\n' + $('.suite').map(function() {
             var suiteName = $('h3', this).text();
@@ -146,7 +169,7 @@ window.exportTests = function() {
             }).toArray().join(',\n\n') + '\n\n]; suite.name = "' + suiteName + '"; return suite; })()';
         }).toArray().join(',\n\n\n\n') + '\n]\n')
         .show()
-        .click(function() { $(this).hide(); $('section').show(); });
+        .click(function() { $('body *').show(); $(this).hide(); });
 };
 
 var runIn = function(iframe, test, callback) {
@@ -176,7 +199,7 @@ var runIn = function(iframe, test, callback) {
         } else if (e.data.name == 'load') {
             setTimeout(function() {
                 doRun(executedResults.length);
-            }, 200);  // why do I need the delay?
+            }, 1000);  // why do I need the delay?
         }
     };
     newHandler.uitestHandler = true;

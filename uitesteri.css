@@ -1,17 +1,25 @@
 .body {
 	display: flex;
 	flex-direction: row;
+	flex: 1;
+}
+body {
+	margin: 0;
+	display: flex;
+	flex-direction: column;	
+	font-family: sans-serif;
+}
+body, h1, h3, h4 {
+	font-weight: lighter;
 }
 section {
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	padding: 0.5em;
 }
 section:first-child {
+	padding-right: 0.5em;
 	width: 40%;
-	height: 100%;
-	overflow-y: scroll;
 	flex-grow: 0;
 }
 pre {
@@ -19,25 +27,103 @@ pre {
 	font-size: 0.75em;
 	margin: 0;
 }
+h1 {
+	padding: 0.25em;
+	padding-bottom: 0;
+    margin: 0;
+    background-color: rgba(136, 0, 0, 0.13);
+    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(136, 0, 0, 0.19);
+    font-family: fantasy;
+}
+h1 span {
+	font-size: 0.5em;
+    font-style: italic;
+    vertical-align: middle;
+    font-family: sans-serif;
+}
+h1 a {
+	text-decoration: none;
+	color: black;
+	height: 1.8em;
+    font-size: 0.6em;
+    vertical-align: top;
+    font-family: sans-serif;
+    display: inline-block;
+    margin: 0 1em;
+    padding: 0 1em;
+    padding-top: 0.5em;
+    border: 1px solid rgba(136, 0, 0, 0.19);
+    border-width: 0 1px;
+}
 h3, h4 {
 	display: inline;
 	margin: 0 0.5em;
 }
+h3 {
+	line-height: 1.8em;
+}
+h4 {
+	line-height: 2em;
+}
+iframe {
+	flex: 1;
+	border-radius: 3px;
+    border-color: #eeeeee;
+    border-width: 1px;
+}
 button {
 	vertical-align: top;
+    width: 2em;
+    height: 2em;
+    margin-left: 2px;
+    font-size: 1em;
+    border-radius: 3px;
+    background: #eeeeee;
+    border-width: 1px;
+    border-color: #eeeeee;
+    color: #999999;
 }
-.middle {
-	padding: 1em 0;
+button:hover {
+	background: #dddddd;
+}
+.test button {
+	width: 1.75em;
+	height: 1.75em;
+}
+input {
+	width: 4em;
+    height: 2em;
+    font-size: 1em;
+    border-radius: 3px;
+    border-color: #eeeeee;
+    border-width: 1px;
+}
+.suites {
+	padding: 1.5em 0;
+	overflow-y: scroll;
 }
 .suite {
 	padding: 0.5em 0;
+}
+.remove {
+	float: right;
+	opacity: 0;
+}
+.suite:hover > .remove {
+	opacity: 1;
+	transition: opacity 0.5s ease-out;
+	transition-delay: 2s;
+	margin-right: 5px;
 }
 .test pre,
 .test .results {
     max-height: 0;
     transition: max-height 0.5s ease-out;
+    transition-delay: 300ms;
     overflow: hidden;
     border-width: 0;
+    padding: 0;
 }
 .test.running pre,
 .test:hover pre,
@@ -45,10 +131,25 @@ button {
 .test pre:focus {
 	max-height: 100%;
 	transition: max-height 0.5s ease-out;
-	border-width: 1px;
+	transition-delay: 500ms;
+}
+.test:hover {
+	border: 1px solid #eeeeee;
+}
+.test:hover .remove {
+	opacity: 1;
+	transition: opacity 0.5s ease-out;
+	transition-delay: 2s;
+}
+.test .run {
+	display: none;
+}
+.test:hover .run {
+	display: inline-block;
 }
 .test {
-	margin: 10px;
+	border: 1px solid #ffffff;
+	margin: 0 1em 0.25em 1em;
 }
 .test .name {
 	font-weight: bold;
@@ -61,21 +162,33 @@ button {
 	margin-left: 10px;
 	font-size: 0.75em;
 }
-.testframe {
-	height: 100%;
+.delay {
+	float: right;
 }
-.running {
+.test.running {
 	color: orange;
 	border: 1px solid orange;
+}
+.running .pause {
+	display: inline-block;
+}
+.pause,
+.play,
+.step,
+.paused .pause,
+.running .run,
+.running .test .run {
+	display: none;
+}
+.paused .play,
+.paused .step {
+	display: inline-block;
 }
 .success {
 	color: green;
 }
 .failed {
 	color: red;
-}
-.remove {
-	float: right;
 }
 #export {
 	display: none;
