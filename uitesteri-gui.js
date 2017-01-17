@@ -86,11 +86,7 @@ var run = function(tests) {
     }
 
     var test = tests[0];
-
-    var elementRectTop = test.getBoundingClientRect().left
-    var absoluteElementTop = elementRectTop + window.pageYOffset;
-    var middle = absoluteElementTop - (window.innerHeight / 2);
-    window.scrollTo(0, middle);
+    test.scrollIntoView(false);
 
     $(document.body).addClass('running');
     $(test).addClass('running');
