@@ -166,8 +166,8 @@ input {
 	float: right;
 }
 .test.running {
-	color: orange;
-	border: 1px solid orange;
+	color: blue;
+	border: 1px solid blue;
 }
 .running .pause {
 	display: inline-block;
@@ -188,6 +188,9 @@ input {
 	color: green;
 }
 .failed {
+	color: orange;
+}
+.error {
 	color: red;
 }
 #export {

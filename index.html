@@ -15,7 +15,8 @@
 		<section>
 			<div>
 				<button onclick="newSuite()" title="add test suite">++</button>
-				<button onclick="exportTests()" title="export all tests">&darr;</button>
+				<button onclick="exportTests()" title="export all tests">&uarr;</button>
+				<a class="button" onclick="downloadResults(this)" href="" download="results.xml"><button title="download test results as XML" >&darr;</button></a>
 				<button class="run" title="run all tests" onclick="runall()">I&#9658;</button>
 				<div class="delay">
 					<button class="pause" title="pause" onclick="pause()">II</button>

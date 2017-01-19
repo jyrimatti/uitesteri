@@ -14,20 +14,39 @@ $(function() {
         }
     };}(window.onmessage);
 
-    if (window.location.hash.length <= 1) {
-        window.location.hash = 'https://raw.githubusercontent.com/jyrimatti/uitesteri/master/demosuites.js';
-    }
-    if (window.location.hash.length > 1) {
-        var load = window.location.hash.substring(1);
-        $.get(load).success(function(data) {
-            eval(data).forEach(function(s) { addSuite(s); });
+    var load = window.location.hash.length > 1 ? window.location.hash.substring(1) : 'https://raw.githubusercontent.com/jyrimatti/uitesteri/master/demosuites.js';
+    window.history.replaceState(null, null, window.location.pathname + window.location.search);
+    $.get(load).success(function(data) {
+        eval(data).forEach(function(s) {
+            addSuite(s).find('h3').attr('title', load);
         });
-    }
+    });
 
-    if (window.location.search.indexOf('autorun') != -1) {
-        runall();
+    var autorun = getParameterByName('autorun');
+    if (autorun === '') {
+        console.info('Autorunning all tests');
+        setTimeout(runall, 1000);
+    } else if (autorun) {
+        setTimeout(function() {
+            $('.suite h3:contains(' + autorun + ')').each(function() {
+                console.info('Autorunning suite: ' + $(this).text());
+                $(this).parents('.suite').find('button.run').click();
+            });
+        }, 1000);
     }
 });
+
+var getParameterByName = function(name, url) {
+    if (!url) {
+      url = window.location.href;
+    }
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
 
 var postMsg = function(data) {
     var testframe = document.getElementById('testframe');
@@ -43,6 +62,7 @@ var addSuite = function(suite) {
     suite.forEach(function(test) {
         addTest(testContainer, test);
     });
+    return suiteHTML;
 };
 
 var addTest = function(suite, test) {
@@ -60,7 +80,9 @@ var resetTest = function(test) {
 };
 
 var runall = function() {
+    window.history.replaceState(null, null, window.location.pathname + '?autorun');
     $('.test').each(function() {resetTest(this);});
+    $('#speed').val(1);
     run($('.test'));
 };
 
@@ -102,8 +124,9 @@ var run = function(tests) {
 
 var finished = function(test, results) {
     console.info(results);
+    var ms = results.results.ended-results.results.started;
     $(test).addClass(errors(results).length > 0 ? 'failed' : 'success')
-      .find('.elapsed').text('(' + (results.results.ended-results.results.started) + 'ms)')
+      .find('.elapsed').attr('data-elapsed', ms).text('(' + ms + 'ms)')
       .parent().find('.results').text(JSON.stringify(errors(results).map(function(r) { return r.exception.message; })));
 };
 
@@ -155,7 +178,7 @@ window.removeTest = function(self) {
 };
 
 window.exportTests = function() {
-    $('body *').hide();
+    $('body > *').hide();
     $('#export')
         .text('[\n' + $('.suite').map(function() {
             var suiteName = $('h3', this).text();
@@ -165,7 +188,54 @@ window.exportTests = function() {
             }).toArray().join(',\n\n') + '\n\n]; suite.name = "' + suiteName + '"; return suite; })()';
         }).toArray().join(',\n\n\n\n') + '\n]\n')
         .show()
-        .click(function() { $('body *').show(); $(this).hide(); });
+        .click(function() { $('body > *').show(); $(this).hide(); });
+};
+
+window.downloadResults = function(self) {
+    $(self).attr('href', 'data:application/octet-stream;charset=utf-8;base64,' + btoa(resultsXML()));
+};
+
+window.resultsXML = function() {
+    var suites = $('.suite');
+    var errors = $('.error', suites).size();
+    var failures = $('.failed', suites).size();
+    var time = 0;
+    $('.test .elapsed', suites).each(function() { time += parseInt($(this).attr('data-elapsed')); });
+
+    return '' +
+    '<?xml version="1.0" encoding="UTF-8"?>\n' +    
+    '<testsuites errors="' + errors + '" failures="' + failures + '" time="' + (time/1000) + '">\n' +
+    
+    suites.get().map(function(suite) {
+        var suiteTests = $('.test', suite);
+        var errors = $('.error', suite).size();
+        var failures = $('.failed', suite).size();
+        var name = escapeXML($('h3', suite).text());
+        var tests = suiteTests.size();
+        var suiteTime = 0;
+        $('.elapsed', suiteTests).each(function() { suiteTime += parseInt($(this).attr('data-elapsed')); });
+        return '' +
+    '    <testsuite errors="' + errors + '" failures="' + failures + '" name="' + name + '" tests="' + tests + '" time="' + (suiteTime/1000) + '">\n' +
+            suiteTests.get().map(function(test) {
+                var name = escapeXML($('h4', test).text());
+                var testTime = parseInt($('.elapsed', test).attr('data-elapsed'));
+                var message = escapeXML($('.results', test).text());
+                return '' +
+       '        <testcase name="' + name + '" time="' + (testTime/1000) + '">\n' +
+       ($(test).hasClass('failed') ?
+       '            <failure message="' + message + '" />\n'
+       : $(test).hasClass('error') ?
+       '            <error message="' + message + '" />\n'
+       : '') +
+       '        </testcase>';
+            }).join('\n') + '\n' +
+    '    </testsuite>';
+    }).join('\n') + '\n' +
+    '</testsuites>';
+};
+
+window.escapeXML = function(text) {
+    return text.replace(new RegExp('&', 'g'), '&amp;').replace(new RegExp('"', 'g'), '&quot;').replace(new RegExp("'", 'g'), '&apos;').replace(new RegExp('<', 'g'), '&lt;').replace(new RegExp('>', 'g'), '&gt;')
 };
 
 var runIn = function(iframe, test, callback) {
