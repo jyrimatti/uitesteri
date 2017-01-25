@@ -83,5 +83,29 @@
 }; test.title = "Luvanhakija"; return test; })()
 
 
-]; suite.title = "Lupapiste suite"; return suite; })()
+]; suite.title = "Lupapiste suite"; return suite; })(),
+
+
+
+(function() {var suite = [
+
+(function() {var test = function() {
+  with (uitesteri) with (commands) {
+    var zoomslider = function() {return document.getElementsByClassName('ol-zoomslider')[0]};
+    return steps(
+      gotoLocation('https://lahteenmaki.net/https/rata.digitraffic.fi/infra-api/'),
+      click(find('+')),
+      click(find('+')),
+      click(find('-')),
+      click(find('-')),
+      drag(zoomslider, 30),
+      highlight(find('500 m')),
+      drag(zoomslider, 70),
+      highlight(find('10 km'))
+    );
+  }
+}; test.title = "Zoom"; return test; })()
+
+
+]; suite.title = "Infra-API suite"; return suite; })()
 ]

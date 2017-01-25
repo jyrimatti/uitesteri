@@ -70,6 +70,18 @@
         }
     };}(window.onmouseout);
 
+    var oldSend = XMLHttpRequest.prototype.send;
+    XMLHttpRequest.prototype.send = function() {
+        uitesteri.active += 1;
+        oldSend.apply(this, arguments);
+        this.addEventListener('readystatechange', function() {
+            if (this.readyState === XMLHttpRequest.DONE) {
+                uitesteri.active -= 1;
+                uitesteri.lastFinishTime = new Date();
+            }
+        }, false);
+    };
+
     var style = document.createElement('style');
     var sattr = document.createAttribute('type');
     sattr.value = 'text/css';
@@ -82,6 +94,8 @@
 
 window.uitesteri = {
     speed: 200,
+    active: 0,
+    lastFinishTime: new Date(),
 
     postMessage: function(data) {
         console.debug('uitesteri-runner posting message:');
@@ -139,7 +153,9 @@ window.uitesteri = {
 
             var data = Array.prototype.slice.call(context.querySelectorAll('[data-uitesteri*="' + text + '"]'));
 
-            var results = elements.concat(inputs).concat(optgroups).concat(options).concat(images).concat(data);
+            var title = Array.prototype.slice.call(context.querySelectorAll('[title*="' + text + '"]'));
+
+            var results = elements.concat(inputs).concat(optgroups).concat(options).concat(images).concat(data).concat(title);
             if (results.length == 0 && context != document.body) {
                 return uitesteri.findFrom(text, context.parentNode)();
             } else if (results.length == 0) {
@@ -233,33 +249,13 @@ window.uitesteri = {
         if (!delay) delay = 1;
         setTimeout(function() {
             // if last known ajax request was active during last 500ms...
-            if (new Date() - uitesteri.lastAjaxActiveTime() < 500)
+            var lastAjaxActiveTime = uitesteri.active > 0 ? new Date() : uitesteri.lastFinishTime;
+            if (new Date() - lastAjaxActiveTime < 500)
                 uitesteri.waitAjax(callback, delay*2);
             else
                 callback();
         }, delay);
     },
-
-    lastAjaxActiveTime: (function() {
-        var oldSend = XMLHttpRequest.prototype.send;
-        var active = 0;
-        var lastFinishTime = new Date();
-
-        XMLHttpRequest.prototype.send = function() {
-            active += 1;
-            oldSend.apply(this, arguments);
-            this.addEventListener('readystatechange', function() {
-                if (this.readyState === XMLHttpRequest.DONE) {
-                    active -= 1;
-                    lastFinishTime = new Date();
-                }
-            }, false);
-        };
-
-        return function() {
-            return active > 0 ? new Date() : lastFinishTime;
-        };
-    })(),
 
     simulate: function(elem, event, args) {
         return YUI().use('node-event-simulate', function(Y) {
@@ -337,11 +333,11 @@ window.uitesteri = {
             }]);
         },
         drag: function(elemFn, toPercentage) {
-            return uitesteri.commands.mousemove(uitesteri.getX(elemFn), uitesteri.getY(elemFn)).concat([{
+            return [{
                 name: 'drag',
                 toPercentage: toPercentage,
                 elemFn: elemFn
-            }]);
+            }];
         },
         clickPoint: function(x, y) {
             return uitesteri.commands.mousemove(function() { return x; }, function() { return y; }).concat([{
@@ -414,8 +410,8 @@ window.uitesteri = {
     commandRunners: {
         mousemove: function(c) {
             var elem = document.getElementById('uitesteri-pointer')
-            elem.style.left = c.xFn();
-            elem.style.top = c.yFn();
+            elem.style.left = c.xFn() + 'px';
+            elem.style.top = c.yFn() + 'px';
             if (uitesteri.speed > 0) {
                 elem.style.transition = 'left ' + uitesteri.speed + "ms";
                 elem.style.transition = 'top ' + uitesteri.speed + "ms";
@@ -499,9 +495,22 @@ window.uitesteri = {
                 elem = elem.nextSibling.querySelector('.ui-slider-handle');
             }
 
-            var dx = elem.parentNode.clientWidth > elem.parentNode.clientHeight ? c.toPercentage*elem.parentNode.clientWidth/100 : 0;
-            var dy = elem.parentNode.clientWidth > elem.parentNode.clientHeight ? 0 : c.toPercentage*elem.parentNode.clientHeight/100;
-            uitesteri.simulate(elem, 'drag', { dx: dx, dy: dy, moves: parseInt(uitesteri.speed/100) });
+            var r = elem.getBoundingClientRect();
+            var dx = elem.clientWidth > elem.clientHeight ? c.toPercentage*elem.clientWidth/100 : (r.right - r.left)/2;
+            var dy = elem.clientWidth > elem.clientHeight ? (r.bottom - r.top)/2 : c.toPercentage*elem.clientHeight/100;
+            
+            var x = r.left + dx;
+            var y = r.top + dy;
+
+            var pointer = document.getElementById('uitesteri-pointer');
+            pointer.style.left = x + 'px';
+            pointer.style.top = y + 'px';
+            if (uitesteri.speed > 0) {
+                pointer.style.transition = 'left ' + uitesteri.speed + "ms";
+                pointer.style.transition = 'top ' + uitesteri.speed + "ms";
+            }
+
+            uitesteri.simulate(elem, 'click', { clientX: x, clientY: y });
         },
         clickPoint: function(c) {
             var elem = document.elementFromPoint(c.x, c.y);
