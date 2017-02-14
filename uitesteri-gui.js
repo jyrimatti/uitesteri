@@ -20,7 +20,7 @@ $(function() {
         if (e.data.name == 'load') {
             postMsg({ name: 'init', url: 'https://cdnjs.cloudflare.com/ajax/libs/yui/3.18.0/yui/yui-min.js' }, '*');
             setTimeout(function() {
-                postMsg({ name: 'init', url: window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/')) + '/uitesteri-runner.js' }, '*');
+                postMsg({ name: 'init', url: (window.location.protocol == 'file:' ? 'https://lahteenmaki.net/uitesteri' : window.location.protocol + '//' + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))) + '/uitesteri-runner.js' }, '*');
             }, 200); // why do I need the delay?
         }
         if (original) {
