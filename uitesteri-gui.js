@@ -199,11 +199,9 @@ window.exportTests = function() {
             var suiteName = $('h3', this).text();
             return '(function() {var suite = [\n\n' + $('.test', this).map(function() {
                 var testName = $('h4', this).text();
-                return '(function() {var test = function() {\n' + $('pre', this).text() + '\n; test.name = "' + testName + '"; return test; })()';
-            }).toArray().join(',\n\n') + '\n\n]; suite.name = "' + suiteName + '"; return suite; })()';
-        }).toArray().join(',\n\n\n\n') + '\n]);\n')
-        .show()
-        .click(function() { $('body > *').show(); $(this).hide(); });
+                return '(function() {var test = ' + $('pre', this).text() + '; test.title = "' + testName + '"; return test; })()';
+            }).toArray().join(',\n\n') + '\n\n\n\n]; suite.title = "' + suiteName + '"; return suite; })()';
+        }).toArray().join(',\n\n\n') + '\n]);\n';
 };
 
 window.downloadResults = function(self) {

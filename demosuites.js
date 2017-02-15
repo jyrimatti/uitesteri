@@ -2,7 +2,7 @@ addSuites([
 
 (function() {var suite = [
 
-(function() {var test = function() {
+(function() {var test = function () {
   with (uitesteri) with (commands) {
     return steps(
       gotoLocation('demo.html'),
@@ -16,7 +16,7 @@ addSuites([
   }
 }; test.title = "Basics"; return test; })(),
 
-(function() {var test = function() {
+(function() {var test = function () {
   with (uitesteri) with (commands) {
     return steps(
       gotoLocation('demo.html'),
@@ -27,7 +27,7 @@ addSuites([
   }
 }; test.title = "Labels and fieldsets"; return test; })(),
 
-(function() {var test = function() {
+(function() {var test = function () {
   with (uitesteri) with (commands) {
     return steps(
       gotoLocation('demo.html'),
@@ -66,7 +66,7 @@ addSuites([
 
 (function() {var suite = [
 
-(function() {var test = function() {
+(function() {var test = function () {
   with (uitesteri) with (commands) {
     return steps(
       gotoLocation('https://lahteenmaki.net/https/www.lupapiste.fi/'),
@@ -84,13 +84,13 @@ addSuites([
 }; test.title = "Luvanhakija"; return test; })()
 
 
-]; suite.title = "Lupapiste suite"; return suite; })(),
 
+]; suite.title = "Lupapiste suite"; return suite; })(),
 
 
 (function() {var suite = [
 
-(function() {var test = function() {
+(function() {var test = function () {
   with (uitesteri) with (commands) {
     var zoomslider = function() {return document.getElementsByClassName('ol-zoomslider')[0]};
     return steps(
@@ -108,13 +108,13 @@ addSuites([
 }; test.title = "Zoom"; return test; })()
 
 
-]; suite.title = "Infra-API suite"; return suite; })(),
 
+]; suite.title = "Infra-API suite"; return suite; })(),
 
 
 (function() {var suite = [
 
-(function() {var test = function() {
+(function() {var test = function () {
   with (uitesteri) with (commands) {
     return steps(
       gotoLocation('https://lahteenmaki.net/https/rata.digitraffic.fi/vuosisuunnitelmat/')
@@ -124,6 +124,6 @@ addSuites([
 }; test.title = "Zoom"; return test; })()
 
 
-]; suite.title = "Vuosisuunnitelmat suite"; return suite; })()
 
+]; suite.title = "Vuosisuunnitelmat suite"; return suite; })()
 ]);
