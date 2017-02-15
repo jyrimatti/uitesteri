@@ -13,6 +13,9 @@ var createScript = function(uri) {
     document.body.appendChild(script);
 }
 
+var stateName;
+var originalState = '';
+
 $(function() {
     window.onmessage = function(original) { return function(e) {
         console.debug('uitesteri-gui received message: ');
@@ -29,9 +32,15 @@ $(function() {
     };}(window.onmessage);
 
     
-    var load = window.location.hash.length > 1 ? window.location.hash.substring(1) : 'demosuites.js';
-    window.history.replaceState(null, null, window.location.pathname + window.location.search);
-    createScript(load);
+    stateName = window.location.hash.length > 1 ? window.location.hash.substring(1) : 'demosuites.js';
+    window.history.replaceState(null, null, window.location.pathname + window.location.search + '#' + stateName);
+    if (stateName.startsWith('http')) {
+        $.get(stateName).success(function(data) {
+            eval(data);
+        });
+    } else {
+        createScript(stateName);
+    }
 
     var autorun = getParameterByName('autorun');
     if (autorun === '') {
@@ -68,10 +77,22 @@ var postMsg = function(data) {
 
 window.addSuites = function(suites) {
     suites.forEach(addSuite);
+
+    var exported = createExport();
+    if (originalState == '') {
+        originalState = exported;
+    }
+
+    var inStore = localStorage.getItem(stateName);
+    if (inStore != exported) {
+        setTimeout(function() {
+            $('.loadState').addClass('showLoadState');
+        }, 2000);
+    }
 };
 
 var addSuite = function(suite) {
-    var suiteHTML = $('<div class="suite"><h3 contenteditable>' + (suite.title ? suite.title : 'unnamed suite') + '</h3><button class="remove" onclick="removeSuite(this)" title="Remove suite">-</button><button onclick="newTest(this)" title="Add test">+</button><button class="run" onclick="runSuite(this)">&#9658;</button><div class="suitetests"></div></div>')
+    var suiteHTML = $('<div class="suite"><h3 contenteditable onblur="saveState()">' + (suite.title ? suite.title : 'unnamed suite') + '</h3><button class="remove" onclick="removeSuite(this)" title="Remove suite">-</button><button onclick="newTest(this)" title="Add test">+</button><button class="run" onclick="runSuite(this)">&#9658;</button><div class="suitetests"></div></div>')
         .appendTo($('.suites'));
     var testContainer = $('.suitetests', suiteHTML);
     suite.forEach(function(test) {
@@ -81,7 +102,7 @@ var addSuite = function(suite) {
 };
 
 var addTest = function(suite, test) {
-    $('<div class="test"><h4 contenteditable></h4><span class="elapsed"></span><button class="run" onclick="runTest(this)">&#9658;</button><button class="remove" onclick="removeTest(this)" title="Remove test">-</button><pre contenteditable class="prettyprint lang-js"></pre><div class="results"></div></div>')
+    $('<div class="test"><h4 contenteditable onblur="saveState()"></h4><span class="elapsed"></span><button class="run" onclick="runTest(this)">&#9658;</button><button class="remove" onclick="removeTest(this)" title="Remove test">-</button><pre contenteditable class="prettyprint lang-js" onblur="saveState()"></pre><div class="results"></div></div>')
         .appendTo(suite)
         .find('.prettyprint').text(test.toString())
         .parents('.test').find('h4').text(test.title ? test.title : 'unnamed test');
@@ -192,10 +213,45 @@ window.removeTest = function(self) {
     $(self).parents('.test').remove();
 };
 
+window.saveState = function() {
+    var exported = createExport();
+    var inStore = localStorage.getItem(stateName)
+    if (exported != inStore) {
+        localStorage.setItem(stateName, exported);
+    }
+    if (originalState != exported) {
+        $(document.body).addClass('modified');
+    } else {
+        $(document.body).removeClass('modified');
+    }
+};
+
+window.loadState = function() {
+    $('.loadState').removeClass('showLoadState');
+
+    var exported = createExport();
+    var inStore = localStorage.getItem(stateName)
+    if (exported != inStore) {
+        $('.suite').remove();
+        eval(inStore);
+    }
+    if (originalState != exported) {
+        $(document.body).addClass('modified');
+    } else {
+        $(document.body).removeClass('modified');
+    }
+};
+
 window.exportTests = function() {
     $('body > *').hide();
     $('#export')
-        .text('addSuites([\n' + $('.suite').map(function() {
+        .text(createExport())
+        .show()
+        .click(function() { $('body > *').show(); $(this).hide(); });
+};
+
+var createExport = function() {
+    return 'addSuites([\n\n' + $('.suite').map(function() {
             var suiteName = $('h3', this).text();
             return '(function() {var suite = [\n\n' + $('.test', this).map(function() {
                 var testName = $('h4', this).text();

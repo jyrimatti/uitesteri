@@ -9,6 +9,9 @@ body {
 	flex-direction: column;	
 	font-family: sans-serif;
 }
+body.modified {
+	border: 3px solid red;
+}
 body, h1, h3, h4 {
 	font-weight: lighter;
 }
@@ -109,6 +112,16 @@ input {
 .remove {
 	float: right;
 	opacity: 0;
+}
+.loadState {
+	opacity: 0;
+}
+.loadState.showLoadState {
+	opacity: 1;
+	color: red;
+	border-color: red;
+	background-color: rgba(136, 0, 0, 0.13);
+	transition: opacity 2s ease-out;
 }
 .suite:hover > .remove {
 	opacity: 1;
