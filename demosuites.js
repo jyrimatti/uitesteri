@@ -1,7 +1,8 @@
-[
+addSuites([
+
 (function() {var suite = [
 
-(function() {var test = function() {
+(function() {var test = function () {
   with (uitesteri) with (commands) {
     return steps(
       gotoLocation('demo.html'),
@@ -15,7 +16,7 @@
   }
 }; test.title = "Basics"; return test; })(),
 
-(function() {var test = function() {
+(function() {var test = function () {
   with (uitesteri) with (commands) {
     return steps(
       gotoLocation('demo.html'),
@@ -26,7 +27,7 @@
   }
 }; test.title = "Labels and fieldsets"; return test; })(),
 
-(function() {var test = function() {
+(function() {var test = function () {
   with (uitesteri) with (commands) {
     return steps(
       gotoLocation('demo.html'),
@@ -65,7 +66,7 @@
 
 (function() {var suite = [
 
-(function() {var test = function() {
+(function() {var test = function () {
   with (uitesteri) with (commands) {
     return steps(
       gotoLocation('https://lahteenmaki.net/https/www.lupapiste.fi/'),
@@ -83,21 +84,21 @@
 }; test.title = "Luvanhakija"; return test; })()
 
 
-]; suite.title = "Lupapiste suite"; return suite; })(),
 
+]; suite.title = "Lupapiste suite"; return suite; })(),
 
 
 (function() {var suite = [
 
-(function() {var test = function() {
+(function() {var test = function () {
   with (uitesteri) with (commands) {
     var zoomslider = function() {return document.getElementsByClassName('ol-zoomslider')[0]};
     return steps(
       gotoLocation('https://lahteenmaki.net/https/rata.digitraffic.fi/infra-api/'),
-      click(find('+')),
-      click(find('+')),
-      click(find('-')),
-      click(find('-')),
+      click(find('Zoom in')),
+      click(find('Zoom in')),
+      click(find('Zoom out')),
+      click(find('Zoom out')),
       drag(zoomslider, 30),
       highlight(find('500 m')),
       drag(zoomslider, 70),
@@ -107,5 +108,22 @@
 }; test.title = "Zoom"; return test; })()
 
 
-]; suite.title = "Infra-API suite"; return suite; })()
-]
+
+]; suite.title = "Infra-API suite"; return suite; })(),
+
+
+(function() {var suite = [
+
+(function() {var test = function () {
+  with (uitesteri) with (commands) {
+    return steps(
+      gotoLocation('https://lahteenmaki.net/https/rata.digitraffic.fi/vuosisuunnitelmat/')
+      
+    );
+  }
+}; test.title = "Zoom"; return test; })()
+
+
+
+]; suite.title = "Vuosisuunnitelmat suite"; return suite; })()
+]);

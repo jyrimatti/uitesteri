@@ -1,4 +1,21 @@
 
+var createScript = function(uri) {
+    var script = document.createElement('script');
+        
+    var type = document.createAttribute('type');
+    type.value = 'text/javascript';
+    script.setAttributeNode(type);
+
+    var src = document.createAttribute('src');
+    src.value = uri;
+    script.setAttributeNode(src);
+
+    document.body.appendChild(script);
+}
+
+var stateName;
+var originalState = '';
+
 $(function() {
     window.onmessage = function(original) { return function(e) {
         console.debug('uitesteri-gui received message: ');
@@ -6,7 +23,7 @@ $(function() {
         if (e.data.name == 'load') {
             postMsg({ name: 'init', url: 'https://cdnjs.cloudflare.com/ajax/libs/yui/3.18.0/yui/yui-min.js' }, '*');
             setTimeout(function() {
-                postMsg({ name: 'init', url: 'https://lahteenmaki.net/uitesteri/uitesteri-runner.js' }, '*');
+                postMsg({ name: 'init', url: (window.location.protocol == 'file:' ? 'https://lahteenmaki.net/uitesteri' : window.location.protocol + '//' + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'))) + '/uitesteri-runner.js' }, '*');
             }, 200); // why do I need the delay?
         }
         if (original) {
@@ -14,13 +31,16 @@ $(function() {
         }
     };}(window.onmessage);
 
-    var load = window.location.hash.length > 1 ? window.location.hash.substring(1) : 'https://raw.githubusercontent.com/jyrimatti/uitesteri/master/demosuites.js';
-    window.history.replaceState(null, null, window.location.pathname + window.location.search);
-    $.get(load).success(function(data) {
-        eval(data).forEach(function(s) {
-            addSuite(s).find('h3').attr('title', load);
+    
+    stateName = window.location.hash.length > 1 ? window.location.hash.substring(1) : 'demosuites.js';
+    window.history.replaceState(null, null, window.location.pathname + window.location.search + '#' + stateName);
+    if (stateName.startsWith('http')) {
+        $.get(stateName).success(function(data) {
+            eval(data);
         });
-    });
+    } else {
+        createScript(stateName);
+    }
 
     var autorun = getParameterByName('autorun');
     if (autorun === '') {
@@ -55,8 +75,24 @@ var postMsg = function(data) {
     testframe.contentWindow.postMessage(data, '*');
 };
 
+window.addSuites = function(suites) {
+    suites.forEach(addSuite);
+
+    var exported = createExport();
+    if (originalState == '') {
+        originalState = exported;
+    }
+
+    var inStore = localStorage.getItem(stateName);
+    if (inStore != exported) {
+        setTimeout(function() {
+            $('.loadState').addClass('showLoadState');
+        }, 2000);
+    }
+};
+
 var addSuite = function(suite) {
-    var suiteHTML = $('<div class="suite"><h3 contenteditable>' + (suite.title ? suite.title : 'unnamed suite') + '</h3><button class="remove" onclick="removeSuite(this)" title="Remove suite">-</button><button onclick="newTest(this)" title="Add test">+</button><button class="run" onclick="runSuite(this)">&#9658;</button><div class="suitetests"></div></div>')
+    var suiteHTML = $('<div class="suite"><h3 contenteditable onblur="saveState()">' + (suite.title ? suite.title : 'unnamed suite') + '</h3><button class="remove" onclick="removeSuite(this)" title="Remove suite">-</button><button onclick="newTest(this)" title="Add test">+</button><button class="run" onclick="runSuite(this)">&#9658;</button><div class="suitetests"></div></div>')
         .appendTo($('.suites'));
     var testContainer = $('.suitetests', suiteHTML);
     suite.forEach(function(test) {
@@ -66,7 +102,7 @@ var addSuite = function(suite) {
 };
 
 var addTest = function(suite, test) {
-    $('<div class="test"><h4 contenteditable></h4><span class="elapsed"></span><button class="run" onclick="runTest(this)">&#9658;</button><button class="remove" onclick="removeTest(this)" title="Remove test">-</button><pre contenteditable class="prettyprint lang-js"></pre><div class="results"></div></div>')
+    $('<div class="test"><h4 contenteditable onblur="saveState()"></h4><span class="elapsed"></span><button class="run" onclick="runTest(this)">&#9658;</button><button class="remove" onclick="removeTest(this)" title="Remove test">-</button><pre contenteditable class="prettyprint lang-js" onblur="saveState()"></pre><div class="results"></div></div>')
         .appendTo(suite)
         .find('.prettyprint').text(test.toString())
         .parents('.test').find('h4').text(test.title ? test.title : 'unnamed test');
@@ -177,18 +213,51 @@ window.removeTest = function(self) {
     $(self).parents('.test').remove();
 };
 
+window.saveState = function() {
+    var exported = createExport();
+    var inStore = localStorage.getItem(stateName)
+    if (exported != inStore) {
+        localStorage.setItem(stateName, exported);
+    }
+    if (originalState != exported) {
+        $(document.body).addClass('modified');
+    } else {
+        $(document.body).removeClass('modified');
+    }
+};
+
+window.loadState = function() {
+    $('.loadState').removeClass('showLoadState');
+
+    var exported = createExport();
+    var inStore = localStorage.getItem(stateName)
+    if (exported != inStore) {
+        $('.suite').remove();
+        eval(inStore);
+    }
+    if (originalState != exported) {
+        $(document.body).addClass('modified');
+    } else {
+        $(document.body).removeClass('modified');
+    }
+};
+
 window.exportTests = function() {
     $('body > *').hide();
     $('#export')
-        .text('[\n' + $('.suite').map(function() {
+        .text(createExport())
+        .show()
+        .click(function() { $('body > *').show(); $(this).hide(); });
+};
+
+var createExport = function() {
+    return 'addSuites([\n\n' + $('.suite').map(function() {
             var suiteName = $('h3', this).text();
             return '(function() {var suite = [\n\n' + $('.test', this).map(function() {
                 var testName = $('h4', this).text();
-                return '(function() {var test = function() {\n' + $('pre', this).text() + '\n; test.name = "' + testName + '"; return test; })()';
-            }).toArray().join(',\n\n') + '\n\n]; suite.name = "' + suiteName + '"; return suite; })()';
-        }).toArray().join(',\n\n\n\n') + '\n]\n')
-        .show()
-        .click(function() { $('body > *').show(); $(this).hide(); });
+                return '(function() {var test = ' + $('pre', this).text() + '; test.title = "' + testName + '"; return test; })()';
+            }).toArray().join(',\n\n') + '\n\n\n\n]; suite.title = "' + suiteName + '"; return suite; })()';
+        }).toArray().join(',\n\n\n') + '\n]);\n';
 };
 
 window.downloadResults = function(self) {
