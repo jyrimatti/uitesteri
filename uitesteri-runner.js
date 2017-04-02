@@ -82,6 +82,28 @@
         }, false);
     };
 
+    var oldFetch = window.fetch;
+    window.fetch = function(input, init) {
+        if (typeof input == 'string') {
+            var replaced = input;
+            if (input.startsWith('http://lahteenmaki.net/http/') || input.startsWith('https://lahteenmaki.net:443/https/')) {
+                replaced = input;
+            } else if (input.startsWith('http://lahteenmaki.net/')) {
+                var foo = window.location.pathname.replace('/http/', '');
+                replaced = input.replace('http://lahteenmaki.net/', 'http://lahteenmaki.net/http/' + foo.substring(0, foo.indexOf('/')) + '/');
+            } else if (input.startsWith('https://lahteenmaki.net:443/')) {
+                var foo = window.location.pathname.replace('/https/', '');
+                replaced = input.replace('https://lahteenmaki.net:443/', 'https://lahteenmaki.net:443/https/' + foo.substring(0, foo.indexOf('/')) + '/');
+            } else {
+                replaced = input;
+            }
+            console.debug('Replacing url: ' + input + ' with: ' + replaced);
+            return oldFetch(replaced, init);
+        } else {
+            return oldFetch(input, init);
+        }
+    };
+
     var style = document.createElement('style');
     var sattr = document.createAttribute('type');
     sattr.value = 'text/css';
@@ -693,3 +715,4 @@ window.uitesteri = {
     }
 
 };
+
